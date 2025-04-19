@@ -348,6 +348,5 @@ addLayer("a", {
 			"blank", "blank",
 			"achievements",
 		],
-	layerShown(){return player.points.gte(1000)}
     }, 
 )
