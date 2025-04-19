@@ -292,12 +292,7 @@ addLayer("s", {
 		  unlocked() { return true }
 		},
 	},
-    layerShown(){return true},
-	doReset(resettingLayer) {
-			let keep = [];
-			if (hasMilestone("f", 0) && resettingLayer=="f") keep.push("upgrades")
-			if (layers[resettingLayer].row > this.row) layerDataReset("j", keep)
-		},
+    layerShown(){return hasAchievement('a',15)},
 })
 addLayer("a", {
         startData() { return {
@@ -353,5 +348,6 @@ addLayer("a", {
 			"blank", "blank",
 			"achievements",
 		],
+	layerShown(){return player.points.gte(1000)}
     }, 
 )
