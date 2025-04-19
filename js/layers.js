@@ -17,6 +17,7 @@ addLayer("j", {
         mult = new Decimal(1)
 		if (hasUpgrade("j",13)) mult = mult.times(upgradeEffect("j",13))
 		if (hasUpgrade("f",11)) mult = mult.times(upgradeEffect("f",11))
+		if (hasUpgrade("s",11)) mult = mult.times(upgradeEffect("s",11))
         return mult
     },
     gainExp() { // Calculate the exponent on main currency from bonuses
@@ -107,12 +108,12 @@ addLayer("f", {
     symbol: "F", // This appears on the layer's node. Default is the id with the first letter capitalized
     position: 0, // Horizontal position within a row. By default it uses the layer id and sorts in alphabetical order
     startData() { return {
-        unlocked: true,
+        unlocked: false,
 		points: new Decimal(0),
 		energy: new Decimal(0),
     }},
     color: "#a3a2a5",
-    requires: new Decimal(100), // Can be a function that takes requirement increases into account
+    requires: new Decimal(50), // Can be a function that takes requirement increases into account
     resource: "factories", // Name of prestige currency
     baseResource: "jimbos", // Name of resource prestige is based on
     baseAmount() {return player.j.points}, // Get the current amount of baseResource
@@ -121,6 +122,7 @@ addLayer("f", {
     gainMult() { // Calculate the multiplier for main currency from bonuses
         mult = new Decimal(1)
 		if (hasUpgrade("f",21)) { mult = mult.div(upgradeEffect("f",21)) }
+		if (hasUpgrade("s",13)) { mult = mult.div(upgradeEffect("s",13)) }
         return mult
     },
 	effect() {
@@ -198,12 +200,28 @@ addLayer("f", {
 		  effectDisplay() { return "^"+format(upgradeEffect(this.layer, this.id)) },
 		  unlocked() { return true }
 		},
+		23: {
+			title: "Cooking",
+			description: "Spices are slightly boosted by Jimbos.",
+			cost: new Decimal(4),
+			effect() {
+				effect = player.j.points.pow(0.1).add(1)
+				return effect
+			},
+		  effectDisplay() { return format(upgradeEffect(this.layer, this.id))+"x" },
+		  unlocked() { return hasUpgrade("s",12) }
+		},
 	},
 	milestones: {
 			0: {
 				requirementDescription: "4 Factories",
 				done() { return player.f.points.gte(4) },
 				effectDescription: "Factories don't reset Jimbo upgrades.",
+			},
+			1: {
+				requirementDescription: "20 Factories",
+				done() { return player.f.points.gte(20) },
+				effectDescription: "x1.5 Spice.",
 			},
 		},
 		tabFormat: ["main-display",
@@ -215,6 +233,71 @@ addLayer("f", {
 			"blank",
 		 "milestones", "blank", "blank", "upgrades"],
     layerShown(){return hasAchievement('a',11)}
+})
+addLayer("s", {
+	branches: ['j'],
+    name: "spice", // This is optional, only used in a few places, If absent it just uses the layer id.
+    symbol: "S", // This appears on the layer's node. Default is the id with the first letter capitalized
+    position: 1, // Horizontal position within a row. By default it uses the layer id and sorts in alphabetical order
+    startData() { return {
+        unlocked: false,
+		points: new Decimal(0),
+    }},
+    color: "#8f3e1e",
+    requires: new Decimal(5000), // Can be a function that takes requirement increases into account
+    resource: "spices", // Name of prestige currency
+    baseResource: "points", // Name of resource prestige is based on
+    baseAmount() {return player.points}, // Get the current amount of baseResource
+    type: "normal", // normal: cost to gain currency depends on amount gained. static: cost depends on how much you already have
+    exponent: 1/3, // Prestige currency exponent
+    gainMult() { // Calculate the multiplier for main currency from bonuses
+        mult = new Decimal(1)
+		if (hasUpgrade("f",23)) mult = mult.times(upgradeEffect("j",23))
+		if (hasMilestone("f",1)) mult = mult.times(1.5)
+        return mult
+    },
+    gainExp() { // Calculate the exponent on main currency from bonuses
+        return new Decimal(1)
+    },
+    row: 1, // Row the layer is in on the tree (0 is the first row)
+    hotkeys: [
+        {key: "j", description: "J: Reset for jimbos", onPress(){if (canReset(this.layer)) doReset(this.layer)}},
+    ],
+	upgrades: { // FIXED UPGRADE TEXT
+		11: {
+			title: "Salt and Pepper",
+			description: "Spices now boost Jimbos.",
+			cost: new Decimal(2),
+			effect() {
+				effect = player.s.points.add(1).log(10).add(1)
+				return effect
+			},
+		  effectDisplay() { return "/"+format(upgradeEffect(this.layer, this.id)) },
+		  unlocked() { return true }
+		},
+		12: {
+			title: "More Choices",
+			description: "Gain more Factory upgrades. (intended to have 3 but there's only 1 so far lmao)",
+			cost: new Decimal(6),
+		},
+		13: {
+			title: "Placeholders! Yippee!!!",
+			description: "Reduce factory costs with our new invention, Jimspice. (Factory costs cannot go below 50 Jimbos)",
+			cost: new Decimal(10),
+			effect() {
+				effect = player.s.points.add(1).pow(0.5)
+				return effect
+			},
+		  effectDisplay() { return format(upgradeEffect(this.layer, this.id))+"x" },
+		  unlocked() { return true }
+		},
+	},
+    layerShown(){return true},
+	doReset(resettingLayer) {
+			let keep = [];
+			if (hasMilestone("f", 0) && resettingLayer=="f") keep.push("upgrades")
+			if (layers[resettingLayer].row > this.row) layerDataReset("j", keep)
+		},
 })
 addLayer("a", {
         startData() { return {
@@ -257,6 +340,11 @@ addLayer("a", {
                 name: "Higher Domain",
                 done() { return player.f.unlocked }, // update next layer
                 tooltip: "Do a Row 2 Reset.",
+            },
+			21: {
+                name: "Innovation",
+                done() { return player.f.points.gte(10) },
+                tooltip: "Get 10 Factories.",
             },
 		},
 		tabFormat: [
