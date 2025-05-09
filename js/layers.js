@@ -25,7 +25,7 @@ addLayer("j", {
     },
     row: 0, // Row the layer is in on the tree (0 is the first row)
     hotkeys: [
-        {key: "j", description: "J: Reset for jimbos", onPress(){if (canReset(this.layer)) doReset(this.layer)}},
+        {key: "j", description: "J: Reset for Jimbos", onPress(){if (canReset(this.layer)) doReset(this.layer)}},
     ],
 	upgrades: { // FIXED UPGRADE TEXT
 		11: {
@@ -142,7 +142,7 @@ addLayer("f", {
     },
     row: 1, // Row the layer is in on the tree (0 is the first row)
     hotkeys: [
-        {key: "f", description: "F: Reset for factories", onPress(){if (canReset(this.layer)) doReset(this.layer)}},
+        {key: "f", description: "F: Reset for Factories", onPress(){if (canReset(this.layer)) doReset(this.layer)}},
     ],
 	upgrades: { // CHANGE UPGRADE TEXT I FORGOR :sob:
 		11: {
@@ -261,7 +261,7 @@ addLayer("s", {
     },
     row: 1, // Row the layer is in on the tree (0 is the first row)
     hotkeys: [
-        {key: "j", description: "J: Reset for jimbos", onPress(){if (canReset(this.layer)) doReset(this.layer)}},
+        {key: "s", description: "S: Reset for Spice", onPress(){if (canReset(this.layer)) doReset(this.layer)}},
     ],
 	upgrades: { // FIXED UPGRADE TEXT
 		11: {
